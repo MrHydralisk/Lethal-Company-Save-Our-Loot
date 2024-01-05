@@ -92,16 +92,36 @@ namespace SaveOurLoot
                 }
                 else
                 {
-                    foreach (GrabbableObject gObject in gObjectsScrap)
+                    if (Config.valueSaveEnabled?.Value ?? false)
                     {
-                        if (RNG.NextDouble() >= (1f - (Config.saveEachChance?.Value ?? 0.5f)))
+                        gObjectsScrap = gObjectsScrap.OrderByDescending((GrabbableObject go) => go.scrapValue).ToList();
+                        int totalScrap = gObjectsScrap.Sum((GrabbableObject go) => go.scrapValue);
+                        float saveScrap = totalScrap * (Config.valueSavePercent?.Value ?? 0.25f);
+                        foreach (GrabbableObject gObject in gObjectsScrap)
                         {
-                            Plugin.MLogS.LogInfo($"{gObject.name} Saved");
-                        }
-                        else
-                        {
-                            Plugin.MLogS.LogInfo($"{gObject.name} Lost");
+                            totalScrap -= gObject.scrapValue;
+                            Plugin.MLogS.LogInfo($"{gObject.name} Lost by Value {gObject.scrapValue}");
                             DespawnItem(gObject);
+                            if (totalScrap < saveScrap)
+                            {
+                                Plugin.MLogS.LogInfo($"{totalScrap} Scrap Value Saved");
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (GrabbableObject gObject in gObjectsScrap)
+                        {
+                            if (RNG.NextDouble() >= (1f - (Config.saveEachChance?.Value ?? 0.5f)))
+                            {
+                                Plugin.MLogS.LogInfo($"{gObject.name} Saved");
+                            }
+                            else
+                            {
+                                Plugin.MLogS.LogInfo($"{gObject.name} Lost");
+                                DespawnItem(gObject);
+                            }
                         }
                     }
                 }

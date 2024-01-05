@@ -5,6 +5,7 @@ Ever wanted to adjust loot loss after failing a mission? Then this mod might hel
 # Features
 - Chance to save all Loot.
 - Chance to save each Loot.
+- Save loot based on percentage of total scrap value among loot.
 
 All features enabled/disabled and values can be adjusted in Config.
 # Client/Server

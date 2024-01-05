@@ -1,6 +1,6 @@
 {
     "name": "SaveOurLoot",
-    "version_number": "1.0.0",
+    "version_number": "1.1.0",
     "website_url": "https://github.com/MrHydralisk/Lethal-Company-Save-Our-Loot",
     "description": "Mod for Lethal Company, that allow adjusting item loss after mission",
     "dependencies": [
