@@ -124,6 +124,17 @@ namespace SaveOurLoot
                             }
                         }
                     }
+                    if (Config.equipmentLossEnabled?.Value ?? false)
+                    {
+                        foreach (GrabbableObject gObject in gObjectsEquipment)
+                        {
+                            if (RNG.NextDouble() >= (1f - (Config.equipmentLossChance?.Value ?? 0.1f)))
+                            {
+                                Plugin.MLogS.LogInfo($"{gObject.name} Equipment Lost");
+                                DespawnItem(gObject);
+                            }
+                        }
+                    }
                 }
             }
             return true;

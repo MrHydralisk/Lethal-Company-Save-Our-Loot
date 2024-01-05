@@ -1,3 +1,6 @@
+**1.2.0**
+- Chance to loose each Equipment.
+
 **1.1.0**
 - Save loot based on percentage of total scrap value among loot.
 
