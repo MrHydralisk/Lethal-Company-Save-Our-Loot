@@ -111,6 +111,7 @@ namespace SaveOurLoot
                     }
                     else
                     {
+                        int lostSCount = 0;
                         foreach (GrabbableObject gObject in gObjectsScrap)
                         {
                             if (RNG.NextDouble() >= (1f - (Config.saveEachChance?.Value ?? 0.5f)))
@@ -121,17 +122,30 @@ namespace SaveOurLoot
                             {
                                 Plugin.MLogS.LogInfo($"{gObject.name} Lost");
                                 DespawnItem(gObject);
+                                lostSCount++;
+                                if (lostSCount >= (Config.scrapLossMax?.Value ?? int.MaxValue))
+                                {
+                                    Plugin.MLogS.LogInfo($"Lost total {lostSCount}");
+                                    break;
+                                }
                             }
                         }
                     }
                     if (Config.equipmentLossEnabled?.Value ?? false)
                     {
+                        int lostECount = 0;
                         foreach (GrabbableObject gObject in gObjectsEquipment)
                         {
                             if (RNG.NextDouble() >= (1f - (Config.equipmentLossChance?.Value ?? 0.1f)))
                             {
                                 Plugin.MLogS.LogInfo($"{gObject.name} Equipment Lost");
                                 DespawnItem(gObject);
+                                lostECount++;
+                                if (lostECount >= (Config.equipmentLossMax?.Value ?? int.MaxValue))
+                                {
+                                    Plugin.MLogS.LogInfo($"Equipment Lost total {lostECount}");
+                                    break;
+                                }
                             }
                         }
                     }

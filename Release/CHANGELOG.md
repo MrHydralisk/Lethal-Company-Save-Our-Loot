@@ -1,3 +1,6 @@
+**1.3.0**
+- Max amount of Loot/Equipment that can be lost.
+
 **1.2.0**
 - Chance to loose each Equipment.
 
