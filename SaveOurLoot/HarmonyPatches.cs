@@ -83,8 +83,63 @@ namespace SaveOurLoot
             List<GrabbableObject> gObjectsScrap = result[true].ToList();
             List<GrabbableObject> gObjectsEquipment = result[false].ToList();
 
-            bool afterDeath = StartOfRound.Instance.allPlayersDead;
-            if (afterDeath)
+            if ((Config.hoardingBugInfestationEnabled?.Value ?? false) && (RNG.NextDouble() >= (1f - (Config.hoardingBugInfestationChance?.Value ?? 1f))))
+            {
+                if (Config.hoardingBugInfestationValueLossEnabled?.Value ?? false)
+                {
+                    gObjectsScrap = gObjectsScrap.OrderByDescending((GrabbableObject go) => go.scrapValue).ToList();
+                    float lossScrap = gObjectsScrap.Sum((GrabbableObject go) => go.scrapValue) * (Config.hoardingBugInfestationValueLossPercent?.Value ?? 0.1f);
+                    int stolenScrap = 0;
+                    foreach (GrabbableObject gObject in gObjectsScrap)
+                    {
+                        stolenScrap += gObject.scrapValue;
+                        Plugin.MLogS.LogInfo($"{gObject.name} Lost Value Mafia {gObject.scrapValue}");
+                        DespawnItem(gObject);
+                        if (stolenScrap >= lossScrap)
+                        {
+                            Plugin.MLogS.LogInfo($"{stolenScrap} Scrap Value Lost Mafia");
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    int lostSCount = 0;
+                    foreach (GrabbableObject gObject in gObjectsScrap)
+                    {
+                        if (RNG.NextDouble() >= (1f - (Config.hoardingBugInfestationLossEachChance?.Value ?? 0.1f)))
+                        {
+                            Plugin.MLogS.LogInfo($"{gObject.name} Lost Mafia");
+                            DespawnItem(gObject);
+                            lostSCount++;
+                            if (lostSCount >= (Config.hoardingBugInfestationLossMax?.Value ?? int.MaxValue))
+                            {
+                                Plugin.MLogS.LogInfo($"Lost Mafia total {lostSCount}");
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (Config.hoardingBugInfestationEquipmentLossEnabled?.Value ?? false)
+                {
+                    int lostECount = 0;
+                    foreach (GrabbableObject gObject in gObjectsEquipment)
+                    {
+                        if (RNG.NextDouble() >= (1f - (Config.hoardingBugInfestationEquipmentLossChance?.Value ?? 0.05f)))
+                        {
+                            Plugin.MLogS.LogInfo($"{gObject.name} Equipment Lost Mafia");
+                            DespawnItem(gObject);
+                            lostECount++;
+                            if (lostECount >= (Config.hoardingBugInfestationEquipmentLossMax?.Value ?? int.MaxValue))
+                            {
+                                Plugin.MLogS.LogInfo($"Equipment Lost Mafia total {lostECount}");
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (StartOfRound.Instance.allPlayersDead)
             {
                 if (RNG.NextDouble() >= (1f - (Config.saveAllChance?.Value ?? 0.25f)))
                 {
@@ -92,6 +147,7 @@ namespace SaveOurLoot
                 }
                 else
                 {
+                    gObjectsScrap.RemoveAll((GrabbableObject go) => !go.IsSpawned);
                     if (Config.valueSaveEnabled?.Value ?? false)
                     {
                         gObjectsScrap = gObjectsScrap.OrderByDescending((GrabbableObject go) => go.scrapValue).ToList();
@@ -100,7 +156,7 @@ namespace SaveOurLoot
                         foreach (GrabbableObject gObject in gObjectsScrap)
                         {
                             totalScrap -= gObject.scrapValue;
-                            Plugin.MLogS.LogInfo($"{gObject.name} Lost by Value {gObject.scrapValue}");
+                            Plugin.MLogS.LogInfo($"{gObject.name} Lost Value {gObject.scrapValue}");
                             DespawnItem(gObject);
                             if (totalScrap < saveScrap)
                             {
@@ -133,6 +189,7 @@ namespace SaveOurLoot
                     }
                     if (Config.equipmentLossEnabled?.Value ?? false)
                     {
+                        gObjectsEquipment.RemoveAll((GrabbableObject go) => !go.IsSpawned);
                         int lostECount = 0;
                         foreach (GrabbableObject gObject in gObjectsEquipment)
                         {
