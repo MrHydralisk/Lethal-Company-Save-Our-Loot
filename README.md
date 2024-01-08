@@ -22,3 +22,4 @@ It server-side and required to be installed only by host.
 # My Other Mods
 * [Enhanced Radar Booster](https://github.com/MrHydralisk/Lethal-Company-Enhanced-Radar-Booster)
 * [Enhanced Lockpicker](https://github.com/MrHydralisk/Lethal-Company-Enhanced-Lockpicker)
+* [Majority Vote](https://github.com/MrHydralisk/Lethal-Company-Majority-Vote)

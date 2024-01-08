@@ -22,3 +22,4 @@ It server-side and required to be installed only by host.
 # My Other Mods
 * [Enhanced Radar Booster](https://thunderstore.io/c/lethal-company/p/MrHydralisk/EnhancedRadarBooster/)
 * [Enhanced Lockpicker](https://thunderstore.io/c/lethal-company/p/MrHydralisk/EnhancedLockpicker/)
+* [Majority Vote](https://thunderstore.io/c/lethal-company/p/MrHydralisk/MajorityVote/)
