@@ -18,7 +18,7 @@ It all in your hands now with this highly configurable mod.
 
 All features enabled/disabled and values can be adjusted in Config.
 # Client/Server
-It client-side, but intended to be installed by all players in lobby.
+It server-side and required to be installed only by host.
 # My Other Mods
 * [Enhanced Radar Booster](https://thunderstore.io/c/lethal-company/p/MrHydralisk/EnhancedRadarBooster/)
 * [Enhanced Lockpicker](https://thunderstore.io/c/lethal-company/p/MrHydralisk/EnhancedLockpicker/)
