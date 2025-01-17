@@ -19,6 +19,10 @@ It all in your hands now with this highly configurable mod.
 All features enabled/disabled and values can be adjusted in Config.
 # Client/Server
 It server-side and required to be installed only by host.
+# Links
+For feedback can use:
+[My Discord](https://discord.gg/tKsBgzzTsG) or Lethal Company Modding thread in mod-releases or Github
+
 # My Other Mods
 * [Enhanced Radar Booster](https://thunderstore.io/c/lethal-company/p/MrHydralisk/EnhancedRadarBooster/)
 * [Enhanced Lockpicker](https://thunderstore.io/c/lethal-company/p/MrHydralisk/EnhancedLockpicker/)

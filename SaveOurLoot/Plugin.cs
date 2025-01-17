@@ -1,8 +1,8 @@
 ﻿using BepInEx;
-using System.Runtime.CompilerServices;
-using System;
-using BepInEx.Logging;
 using BepInEx.Configuration;
+using BepInEx.Logging;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace SaveOurLoot
 {

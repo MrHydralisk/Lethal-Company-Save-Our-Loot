@@ -118,7 +118,7 @@ namespace SaveOurLoot
                 {
                     continue;
                 }
-                if (!(gObject.isInShipRoom ||  gObject.isHeld) || gObject.deactivated)
+                if (!(gObject.isInShipRoom || gObject.isHeld) || gObject.deactivated)
                 {
                     Plugin.MLogS.LogInfo($"{gObject.name} Lost Outside");
                     DespawnItem(gObject);
