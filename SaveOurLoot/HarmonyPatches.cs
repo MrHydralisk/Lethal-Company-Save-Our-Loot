@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace SaveOurLoot
 {
@@ -25,7 +26,7 @@ namespace SaveOurLoot
             List<CodeInstruction> codes = new List<CodeInstruction>(instructions);
             for (int i = 0; i < codes.Count; i++)
             {
-                if (codes[i].opcode == OpCodes.Stloc_0)
+                if (codes[i].opcode == OpCodes.Stloc_0) //Ldc_I4_0 Stloc_9
                 {
                     startIndex = i;
                     for (int j = startIndex + 1; j < codes.Count; j++)
@@ -66,8 +67,57 @@ namespace SaveOurLoot
             System.Random RNG = new System.Random(StartOfRound.Instance.randomMapSeed + 369);
             List<GrabbableObject> gObjectsAll = gObjects.ToList();
             List<GrabbableObject> gObjectsInside = new List<GrabbableObject>();
+            try
+            {
+                VehicleController[] array2 = UnityEngine.Object.FindObjectsByType<VehicleController>(FindObjectsSortMode.None);
+                for (int i = 0; i < array2.Length; i++)
+                {
+                    VehicleController vehicleController = array2[i];
+                    if (!vehicleController.magnetedToShip)
+                    {
+                        if (vehicleController.NetworkObject != null)
+                        {
+                            Debug.Log("Despawn vehicle");
+                            vehicleController.NetworkObject.Despawn(destroy: false);
+                        }
+                    }
+                    else
+                    {
+                        vehicleController.CollectItemsInTruck();
+                    }
+                }
+            }
+            catch (Exception arg)
+            {
+                Debug.LogError($"Error despawning vehicle: {arg}");
+            }
+            BeltBagItem[] array3 = UnityEngine.Object.FindObjectsByType<BeltBagItem>(FindObjectsSortMode.None);
+            for (int i = 0; i < array3.Length; i++)
+            {
+                BeltBagItem beltBagItem = array3[i];
+                if ((bool)beltBagItem.insideAnotherBeltBag && (beltBagItem.insideAnotherBeltBag.isInShipRoom || beltBagItem.insideAnotherBeltBag.isHeld))
+                {
+                    beltBagItem.isInElevator = true;
+                    beltBagItem.isInShipRoom = true;
+                }
+                if (beltBagItem.isInShipRoom || beltBagItem.isHeld)
+                {
+                    for (int j = 0; j < beltBagItem.objectsInBag.Count; j++)
+                    {
+                        beltBagItem.objectsInBag[j].isInElevator = true;
+                        beltBagItem.objectsInBag[j].isInShipRoom = true;
+                    }
+                }
+            }
+
+
+
             foreach (GrabbableObject gObject in gObjects)
             {
+                if (gObject == null)
+                {
+                    continue;
+                }
                 if (!(gObject.isInShipRoom ||  gObject.isHeld) || gObject.deactivated)
                 {
                     Plugin.MLogS.LogInfo($"{gObject.name} Lost Outside");

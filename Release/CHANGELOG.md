@@ -1,3 +1,6 @@
+**1.5.0**
+- Updated to work with v69.
+
 **1.4.1-1.4.2**
 - Description Updated
 
