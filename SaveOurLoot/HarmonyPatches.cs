@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -135,6 +136,7 @@ namespace SaveOurLoot
 
             if ((Config.hoardingBugInfestationEnabled?.Value ?? false) && (RNG.NextDouble() >= (1f - (Config.hoardingBugInfestationChance?.Value ?? 1f))))
             {
+                List<string> hoardingBugInfestationLostItems = new List<string>();
                 if (Config.hoardingBugInfestationValueLossEnabled?.Value ?? false)
                 {
                     gObjectsScrap = gObjectsScrap.OrderByDescending((GrabbableObject go) => go.scrapValue).ToList();
@@ -144,6 +146,7 @@ namespace SaveOurLoot
                     {
                         stolenScrap += gObject.scrapValue;
                         Plugin.MLogS.LogInfo($"{gObject.name} Lost Value Mafia {gObject.scrapValue}");
+                        hoardingBugInfestationLostItems.Add(gObject.itemProperties?.itemName ?? gObject.name);
                         DespawnItem(gObject);
                         if (stolenScrap >= lossScrap)
                         {
@@ -160,6 +163,7 @@ namespace SaveOurLoot
                         if (RNG.NextDouble() >= (1f - (Config.hoardingBugInfestationLossEachChance?.Value ?? 0.1f)))
                         {
                             Plugin.MLogS.LogInfo($"{gObject.name} Lost Mafia");
+                            hoardingBugInfestationLostItems.Add(gObject.itemProperties?.itemName ?? gObject.name);
                             DespawnItem(gObject);
                             lostSCount++;
                             if (lostSCount >= (Config.hoardingBugInfestationLossMax?.Value ?? int.MaxValue))
@@ -178,6 +182,7 @@ namespace SaveOurLoot
                         if (RNG.NextDouble() >= (1f - (Config.hoardingBugInfestationEquipmentLossChance?.Value ?? 0.05f)))
                         {
                             Plugin.MLogS.LogInfo($"{gObject.name} Equipment Lost Mafia");
+                            hoardingBugInfestationLostItems.Add(gObject.itemProperties?.itemName ?? gObject.name);
                             DespawnItem(gObject);
                             lostECount++;
                             if (lostECount >= (Config.hoardingBugInfestationEquipmentLossMax?.Value ?? int.MaxValue))
@@ -188,16 +193,24 @@ namespace SaveOurLoot
                         }
                     }
                 }
+                if (hoardingBugInfestationLostItems.Count() > 0)
+                {
+                    string msg = $"Lost to Bug Mafia ({hoardingBugInfestationLostItems.Count()}/{gObjectsInside.Count()}): ";
+                    msg += string.Join("; ", hoardingBugInfestationLostItems.GroupBy(s => s).Select(s => new { name = s.Key, count = s.Count() }).Select(item => item.count > 1 ? $"{item.name} x{item.count}" : item.name));
+                    HUDManager.Instance.StartCoroutine(DisplayAlert("Bug Mafia", "Space ain't no picnic, see? We kept you safe out there, so a little somethin' for our troubles, understand?", msg));
+                }
             }
             if (StartOfRound.Instance.allPlayersDead)
             {
                 if (RNG.NextDouble() >= (1f - (Config.saveAllChance?.Value ?? 0.25f)))
                 {
                     Plugin.MLogS.LogInfo("All Saved");
+                    HUDManager.Instance.StartCoroutine(DisplayAlert(bodyAlertText: "You got lucky. All items was saved.", messageText: "You got lucky. All items was saved."));
                 }
                 else
                 {
                     gObjectsScrap.RemoveAll((GrabbableObject go) => !go.IsSpawned);
+                    List<string> LostItems = new List<string>();
                     if (Config.valueSaveEnabled?.Value ?? false)
                     {
                         gObjectsScrap = gObjectsScrap.OrderByDescending((GrabbableObject go) => go.scrapValue).ToList();
@@ -207,6 +220,7 @@ namespace SaveOurLoot
                         {
                             totalScrap -= gObject.scrapValue;
                             Plugin.MLogS.LogInfo($"{gObject.name} Lost Value {gObject.scrapValue}");
+                            LostItems.Add(gObject.itemProperties?.itemName ?? gObject.name);
                             DespawnItem(gObject);
                             if (totalScrap < saveScrap)
                             {
@@ -227,6 +241,7 @@ namespace SaveOurLoot
                             else
                             {
                                 Plugin.MLogS.LogInfo($"{gObject.name} Lost");
+                                LostItems.Add(gObject.itemProperties?.itemName ?? gObject.name);
                                 DespawnItem(gObject);
                                 lostSCount++;
                                 if (lostSCount >= (Config.scrapLossMax?.Value ?? int.MaxValue))
@@ -246,6 +261,7 @@ namespace SaveOurLoot
                             if (RNG.NextDouble() >= (1f - (Config.equipmentLossChance?.Value ?? 0.1f)))
                             {
                                 Plugin.MLogS.LogInfo($"{gObject.name} Equipment Lost");
+                                LostItems.Add(gObject.itemProperties?.itemName ?? gObject.name);
                                 DespawnItem(gObject);
                                 lostECount++;
                                 if (lostECount >= (Config.equipmentLossMax?.Value ?? int.MaxValue))
@@ -255,6 +271,12 @@ namespace SaveOurLoot
                                 }
                             }
                         }
+                    }
+                    if (LostItems.Count() > 0)
+                    {
+                        string msg = $"Lost items ({LostItems.Count()}/{gObjectsInside.Count()}): ";
+                        msg += string.Join("; ", LostItems.GroupBy(s => s).Select(s => new { name = s.Key, count = s.Count() }).Select(item => item.count > 1 ? $"{item.name} x{item.count}" : item.name));
+                        HUDManager.Instance.StartCoroutine(DisplayAlert(bodyAlertText: $"Some of your loot was lost.", messageText: msg));
                     }
                 }
             }
@@ -270,6 +292,29 @@ namespace SaveOurLoot
                 if (rManager.spawnedSyncedObjects.Contains(gObject.gameObject))
                 {
                     rManager.spawnedSyncedObjects.Remove(gObject.gameObject);
+                }
+            }
+
+            IEnumerator DisplayAlert(string headerAlertText = "Save Our Loot", string bodyAlertText = "", string messageText = "")
+            {
+                int index = 0;
+                while (index < 20)
+                {
+                    if (StartOfRound.Instance.inShipPhase)
+                    {
+                        break;
+                    }
+                    index++;
+                    yield return new WaitForSeconds(5f);
+                }
+                yield return new WaitForSeconds(2f);
+                if (!(string.IsNullOrEmpty(headerAlertText) && string.IsNullOrEmpty(bodyAlertText)))
+                {
+                    HUDManager.Instance.DisplayTip(headerAlertText, bodyAlertText);
+                }
+                if (!string.IsNullOrEmpty(messageText))
+                {
+                    HUDManager.Instance.AddTextToChatOnServer(messageText);
                 }
             }
         }

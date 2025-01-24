@@ -1,3 +1,6 @@
+**1.5.1**
+- Now use alerts and messages to show lost/saved loot after returning to ship.
+
 **1.5.0**
 - Updated to work properly with Vehicle and Bag.
 
