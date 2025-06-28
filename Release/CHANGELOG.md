@@ -1,3 +1,6 @@
+**1.5.2**
+- Rebuild to fit files v72.
+
 **1.5.1**
 - Now use alerts and messages to show lost/saved loot after returning to ship.
 
