@@ -1,3 +1,6 @@
+**1.5.4**
+- Rebuild to fit files v81.
+
 **1.5.3**
 - Rebuild to fit files v73.
 
